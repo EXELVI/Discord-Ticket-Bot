@@ -32,17 +32,20 @@ module.exports = {
 
         var config = await db.collection("config").findOne({ serverID: interaction.guild.id })
         /*{
-            staffID: "",
-            log: {
-                ticket: "1134026401515843694",
-                transcript: "1134026423443664926"
-            },
-            category: {
-                open: "1134607983670743060",
-                closed: "1134608011856465930"
-            }
-
-        }*/
+  "_id": {
+    "$oid": "669cf8b5a53b28300792daf4"
+  },
+  "staffID": "1264553025545044091",
+  "log": {
+    "ticket": "1264554035910803507",
+    "transcript": "1264554001999855636"
+  },
+  "category": {
+    "open": "1264554158346866792",
+    "closed": "1264554192131985489"
+  },
+  "serverID": "587945307908603916"
+}*/
         var ticketnum = countProps(datacoso).toString().padStart(4, '0');
         interaction.guild.channels.create({
             name: "ticket-" + ticketnum,
