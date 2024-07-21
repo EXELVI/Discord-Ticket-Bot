@@ -14,8 +14,6 @@ module.exports = {
         const database = await require("../../db.js")
         const db = await database.db("tickets")
         const client = require("../../client.js")
-        var config = await db.collection("config").findOne({ serverID: i.guild.id })
-
         var canale = client.channels.cache.get(interaction.message.embeds[0].fields[1].value)
 
         if (!canale) return interaction.reply({ content: "The ticket has been deleted" })
