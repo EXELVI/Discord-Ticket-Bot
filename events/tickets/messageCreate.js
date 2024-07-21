@@ -1,24 +1,32 @@
 const Discord = require('discord.js');
-const { permission } = require('process');
+
 module.exports = {
-    name: "claim",
-    permissions: ["MANAGE_CHANNELS"],
-    description: "Claim a ticket",
-    async execute(interaction) {
-        const database = await require("../../db.js")
-        const db = await database.db("tickets")
-        const client = require("../../client.js")
-        
-        var config = await db.collection("config").findOne({ serverID: interaction.guild.id })
-   
-        var ticket = await db.collection("tickets").findOne({ ticketID: interaction.channel.id, serverID: interaction.guild.id })
+    name: "messageCreate",
+    async execute(message) {
+        const client = require('../../client.js');
+        const databasePromise = require('../../db.js');
+        const db = await databasePromise.db("tickets")
+        const config = await db.collection("config").findOne({ serverID: message.guild.id })
 
-        if (!ticket) return interaction.reply("Ticket not found")
 
-        if (ticket.claim) {
-            interaction.reply("Ticket already claimed, use /unclaim first")
-            return
-        }
+        if (message.channel.id != config.category.open) return
+        if (message.author.bot) return
+
+        var nomec = message.channel.name
+        var userid = await message.channel.topic.split(" ")[2]
+
+
+
+        if (message.author.id == userid) return
+        if (!message.member.roles.cache.has(config.staffID)) return
+
+
+        var ticket = await db.collection("tickets").findOne({ ticketID: message.channel.id })
+
+        if (!ticket) return
+
+        if (ticket.claim) return
+
 
         var embed = new Discord.EmbedBuilder()
         .setColor('#ffdd00')
@@ -36,12 +44,12 @@ module.exports = {
 
         embed = new Discord.EmbedBuilder()
             .setColor('#ffdd00')
-            .setTitle('Claim')
+            .setTitle('AutoClaim')
             .setAuthor({ name: interaction.member.user.tag, iconURL: interaction.member.user.displayAvatarURL() })
             .setDescription("Claim by " + interaction.member.user.tag + " | Ticket: " + interaction.channel.name)
             .setTimestamp()
 
         client.channels.cache.get(config.log.ticket).send({ embeds: [embed] })
-
     },
+
 };

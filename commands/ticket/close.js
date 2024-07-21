@@ -67,7 +67,7 @@ module.exports = {
                             .setTitle('🟡 Ticket Closed')
                             .setDescription("Your ticket has been closed, you can request to reopen it if it has not already been deleted")
                             .addFields({ name: "Reason", value: reason }, { name: "Ticket ID", value: interaction.channel.id })
-                    ], components: [new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setLabel("Richiedi di Riaprire").setStyle("1").setCustomId("rreopen"))]
+                    ], components: [new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setLabel("Request to Reopen").setStyle("1").setCustomId("rreopen"))]
                 }).catch({})
 
                 var button1 = new Discord.ButtonBuilder()
