@@ -20,8 +20,9 @@ client.on("ready", async () => {
 
 
     var button1T = new Discord.ButtonBuilder()
-        .setLabel("🇮🇹 Ticket Supporto")
-        .setCustomId("Ticket-it")
+        .setLabel("Ticket")
+        .setEmoji("🎫")
+        .setCustomId("ticket-new")
         .setStyle("1")
 
     var rowT = new Discord.ActionRowBuilder()

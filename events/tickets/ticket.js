@@ -11,8 +11,10 @@ function countProps(obj) {
 }
 
 module.exports = {
-    name: "ticket",
+    name: "interactionCreate",
     async execute(interaction, client) {
+        if (!interaction.isButton()) return;
+        if (interaction.customId != "ticket-new") return;
         const databasePromise = await require("../../db.js")
         const db = await databasePromise.db("tickets")
         if (interaction.guild.channels.cache.find(canale => canale.topic == `User ID: ${interaction.user.id}`)) {
@@ -44,7 +46,42 @@ module.exports = {
     "open": "1264554158346866792",
     "closed": "1264554192131985489"
   },
-  "serverID": "587945307908603916"
+  "serverID": "587945307908603916",
+  ticketCategories: [
+    {
+      "label": "General Support",
+      "description": "A ticket for general support",
+      "value": "general",
+      "embedDescription": "Here you can ask for general support",
+      "emoji": "🔧",
+      "color": "#ababab"
+    },
+    {
+      "label": "Bug Report",
+      "description": "A ticket for bug report",
+      "value": "bug",
+      "embedDescription": "Here you can report a bug",
+      "emoji": "🐞",
+      "color": "#ff0000"
+    },
+    {
+      "label": "Suggestions",
+      "description": "A ticket for suggestions",
+      "value": "suggestions",
+      "embedDescription": "Here you can suggest something",
+      "emoji": "📝",
+      "color": "#ddffdd"
+    },
+    {
+      "label": "Other",
+      "description": "Other",
+      "value": "other",
+      "embedDescription": "Here you can ask for something that isn't listed",
+      "emoji": "❓",
+      "color": "#bb0000"
+    }
+    
+  ]
 }*/
         var ticketnum = countProps(datacoso).toString().padStart(4, '0');
         interaction.guild.channels.create({
@@ -68,16 +105,19 @@ module.exports = {
             ]
         }).then(canale => {
             db.collection("tickets").insertOne({
-                userID: interaction.user.id, serverID: interaction.guild.id, ticketID: canale.id, claim: "", claimMsg: "", language: language, status: "open"
+                userID: interaction.user.id, serverID: interaction.guild.id, ticketID: canale.id, claim: "", claimMsg: "", status: "open"
             })
 
-            var button = new Discord.ButtonBuilder()
+            var buttonn = new Discord.ButtonBuilder()
                 .setURL('https://discord.com/channels/' + interaction.guild.id + '/' + canale.id)
                 .setLabel('Go to ticket')
                 .setEmoji('🎫')
                 .setStyle("Link")
 
-            interaction.reply({ content: canale.toString(), ephemeral: true, components: [button]}).catch(() => { })
+            var roww = new Discord.ActionRowBuilder()
+                .addComponents(buttonn);
+
+            interaction.reply({ content: canale.toString(), ephemeral: true, components: [roww] })
 
             var embedo = new EmbedBuilder()
                 .setColor('#22dd22')
@@ -86,7 +126,7 @@ module.exports = {
                 .setTimestamp()
                 .setDescription(interaction.user.tag + " opened `ticket-" + ticketnum + "`");
 
-                
+
             client.channels.cache.get(config.log.ticket).send({ embeds: [embedo] })
 
 
@@ -98,15 +138,26 @@ module.exports = {
 
             var menu = new Discord.SelectMenuBuilder()
                 .setCustomId('select')
-                .setPlaceholder('Seleziona il tuo problema! 🔴')
+                .setPlaceholder('Select a topic')
                 .addOptions()
+
+            config.ticketCategories.forEach(category => {
+                menu.addOptions([
+                    {
+                        label: category.label,
+                        description: category.description,
+                        value: category.value,
+                        emoji: category.emoji
+                    }
+                ])
+            })
 
 
             if (interaction.user.id == "462339171537780737" || interaction.user.id == "536289373365338147" || interaction.user.id == "1022620526314786817") {
                 menu.addOptions([
                     {
                         label: '👁‍🗨 Test',
-                        description: 'Ticket test, per provare i ticket e le funzionalità',
+                        description: 'Test ticket',
                         value: 'tickett',
                     }
                 ])
@@ -123,10 +174,6 @@ module.exports = {
                 collector.on("collect", async i => {
                     i.deferUpdate()
 
-                    if (await !utenteFounder(i.member)) {
-                        if (interaction.user.id != i.user.id) return
-                    }
-
                     if (i.values[0] == "tickett") {
 
                         var embed = new Discord.EmbedBuilder()
@@ -135,10 +182,19 @@ module.exports = {
                             .setDescription("This is a test ticket, this ticket is used to test the ticket system and its features")
 
                         msg.edit({ embeds: [embed] })
+                    } else {
+                        var category = config.ticketCategories.find(x => x.value == i.values[0])
+
+                        var embed = new Discord.EmbedBuilder()
+                            .setTitle(category.emoji + " " + category.label + " " + category.emoji)
+                            .setColor(category.color)
+                            .setDescription(category.embedDescription)
+
+
+
+                        msg.edit({ embeds: [embed] })
                     }
-
                 })
-
             })
         })
     },
