@@ -22,9 +22,10 @@ module.exports = {
             type: 3
         }],
     onlyStaff: true,
-    async execute(interaction, client) {
+    async execute(interaction) {
         const database = await require("../../db.js")
         const db = await database.db("tickets")
+        const client = require("../../client.js")
 
         var config = await db.collection("config").findOne({ serverID: interaction.guild.id })
         var reason = interaction.options.getString("reason")

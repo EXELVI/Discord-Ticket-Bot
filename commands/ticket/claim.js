@@ -4,9 +4,10 @@ module.exports = {
     name: "claim",
     permissions: ["MANAGE_CHANNELS"],
     description: "Claim a ticket",
-    async execute(interaction, client) {
+    async execute(interaction) {
         const database = await require("../../db.js")
         const db = await database.db("tickets")
+        const client = require("../../client.js")
         
         var config = await db.collection("config").findOne({ serverID: interaction.guild.id })
 

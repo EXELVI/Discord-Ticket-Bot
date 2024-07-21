@@ -12,11 +12,12 @@ function countProps(obj) {
 
 module.exports = {
     name: "interactionCreate",
-    async execute(interaction, client) {
+    async execute(interaction) {
         if (!interaction.isButton()) return;
         if (interaction.customId != "ticket-new") return;
         const databasePromise = await require("../../db.js")
         const db = await databasePromise.db("tickets")
+        const client = require("../../client.js")
         if (interaction.guild.channels.cache.find(canale => canale.topic == `User ID: ${interaction.user.id}`)) {
 
 
