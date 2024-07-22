@@ -1,6 +1,14 @@
 const Discord = require('discord.js');
 
-function calculateAverage(myArray) { //MODIFICATO
+function countProps(obj) {
+    var count = 0;
+    for (var p in obj) {
+        obj.hasOwnProperty(p) && count++;
+    }
+    return count;
+}
+
+function calculateAverage(myArray) {
 
     var i = 0, summ = 0, ArrayLen = countProps(myArray)//myArray.length;
     while (i < ArrayLen) {
@@ -28,7 +36,52 @@ module.exports = {
         let totPage = Math.ceil(leaderboardListStars.length / 7)
         let page = 1;
 
-    
+        for (let i = 7 * (page - 1); i < 7 * page; i++) {
+            if (leaderboardListStars[i]) {
+                switch (i) {
+                    case 0:
+                        leaderboardStars += ":first_place: ";
+                        break
+                    case 1:
+                        leaderboardStars += ":second_place: "
+                        break
+                    case 2:
+                        leaderboardStars += ":third_place: "
+                        break
+                    default:
+                        leaderboardStars += `**#${i + 1}** `
+                }
+
+                let utente = client.guilds.cache.get(settings.idServer).members.cache.find(x => x.id == leaderboardListStars[i].userID);
+                if (utente) leaderboardStars += `${utente.toString()} - **Average ${calculateAverage(leaderboardListStars[i].feedbacks)}** (Count: ${countProps(leaderboardListStars[i].feedbacks)})\n`
+            }
+        }
+
+        let leaderboardListCount = userstatsList.sort(function (a, b) { return countProps(b.feedbacks) - countProps(a.feedbacks) })
+        let leaderboardCount = ""
+
+        for (let i = 7 * (page - 1); i < 7 * page; i++) {
+            if (leaderboardListCount[i]) {
+                switch (i) {
+                    case 0:
+                        leaderboardCount += ":first_place: ";
+                        break
+                    case 1:
+                        leaderboardCount += ":second_place: "
+                        break
+                    case 2:
+                        leaderboardCount += ":third_place: "
+                        break
+                    default:
+                        leaderboardCount += `**#${i + 1}** `
+                }
+
+                let utente = client.guilds.cache.get(settings.idServer).members.cache.find(x => x.id == leaderboardListCount[i].userID);
+                if (utente) leaderboardCount += `${utente.toString()} - **Count ${countProps(leaderboardListStars[i].feedbacks)}** (Average: ${calculateAverage(leaderboardListStars[i].feedbacks)})\n`
+            }
+        }
+
+        
 
     },
 };
