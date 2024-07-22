@@ -44,7 +44,7 @@ module.exports = {
     let embed = new Discord.EmbedBuilder()
       .setTitle("Channel transcript")
       .setDescription(`Transcript of the channel ${i.message.channel.name}`)
-      .addFields({ name: "Transcript", value: "[Press here to go to the web transcript](https://localhost/transcript/" + i.message.guild.id + "/" + i.message.channel.id + ")" })
+      .addFields({ name: "Transcript", value: "[Press here to go to the web transcript](https://localhost/tickets/" + i.message.guild.id + "/" + i.message.channel.id + ")" })
 
     client.channels.cache.get(config.log.transcript).send({ embeds: [embed] })
 

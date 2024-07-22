@@ -18,6 +18,7 @@ manager.on('shardCreate', shard => console.log(`☑️  Launched shard #${shard.
 manager.spawn();
 
 const databasePromise = require('./db.js');
+const client = require('./client.js');
 databasePromise.then(() => {
     console.log("🔌 Connected to the database")
 }).catch(err => {
@@ -38,44 +39,52 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(cors({
     origin: "*"
-})); 
+}));
 app.options('*', cors());
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 
-app.get('/:guild/:ticket', async (req, res) => {
+app.get('/tickets/:guild/:ticket', async (req, res) => {
     var guild = req.params.guild,
         id = req.params.ticket
 
     const db = (await databasePromise).db("tickets")
     var ticket = await db.collection("tickets").findOne({ ticketID: id, serverID: guild })
-    if (!ticket) return res.render("error", { error: "Not Found", code:"404", errormessage: "The ticket does not exist", textcolor: "secondary", color: "#333f73" });
-    res.render("ticket", { ticket: ticket })
+    if (!ticket) return res.render("error", { error: "Not Found", code: "404", errormessage: "The ticket does not exist", textcolor: "secondary", color: "#333f73" });
+    var channel = await manager.broadcastEval(async (client, { channelID, serverID }) => {
+        var server = await client.guilds.cache.get(serverID)
+        if (!server) return false
+        var channel = await server.channels.cache.get(channelID)
+        if (!channel) return false
+        return channel
+    }, { context: { channelID: id, serverID: guild } });
+    var channel = channel.filter(x => x)[0]
+    if (!channel) {
+        if (!fs.existsSync(`transcripts/${guild}`)) return res.render("error", { error: "Not Found", code: "404", errormessage: "The transcript does not exist", textcolor: "secondary", color: "#433f33" });
+        if (!fs.existsSync(`transcripts/${guild}/${id}.html`))  return res.render("error", { error: "Not Found", code: "404", errormessage: "The transcript does not exist", textcolor: "secondary", color: "#433f33" });
+
+        res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
+
+    } else {
+        var channelMessages = await manager.broadcastEval(async (client, { channelID, serverID }) => {
+            var server = await client.guilds.cache.get(serverID)
+            if (!server) return false
+            var channel = await server.channels.cache.get(channelID)
+            if (!channel) return false
+            var messages = await channel.messages.fetch({ limit: 100 })
+            var mapped = messages.map(x => {
+                return { author: x.author, content: x.content, cleanContent: x.cleanContent, timestamp: x.createdTimestamp } })
+            return mapped
+        }, { context: { channelID: id, serverID: guild } });
+        console.log(channelMessages)
+        res.render("ticket", { ticket: ticket, channel: channel, messages: channelMessages.filter(x => x)[0] })
+    }
 });
 
-app.get('/transcript/:guild/:ticket', async (req, res) => {
-    var guild = req.params.guild,
-        id = req.params.ticket
 
-    const db = (await databasePromise).db("tickets")
-    var ticket = await db.collection("tickets").findOne({ ticketID: id, serverID: guild })
-    if (!ticket) return res.send("The ticket does not exist")
-    if (!fs.existsSync(`transcripts/${guild}`)) return res.send("The transcript does not exist")
-    if (!fs.existsSync(`transcripts/${guild}/${id}.html`)) return res.send("The transcript does not exist")
-    
-    res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
-});
 
 app.use(apiPrefix, router);
-
-app.use((err, req, res, next) => {
-    if (!err) {
-        res.status(404).render("error", { error: "Not Found", code:"404", errormessage: "The page you are looking for does not exist", textcolor: "primary", color: "#003f83" });
-    } else {
-        res.status(500).render("error", { error: "Internal Server Error", code:"500", errormessage: "An error occurred while processing your request", textcolor: "danger", color: "#dc3545" });
-    }  
-})
 
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer({

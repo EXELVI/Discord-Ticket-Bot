@@ -13,11 +13,64 @@
     <div class="container">
         <div class="row">
         <div class="col-12">
+            <h1 class="display-4"><%=channel.name%></h1>
             <h2>Status: <%=ticket.status == "open" ? "🟢 Open" : "🔴 Closed"%></h2>
+            <div id="messages">
+                <% messages.forEach((message) => { %>
+               <!--
+                      {
+      channelId: '1264941962851782718',
+      guildId: '587945307908603916',
+      id: '1264941964806193174',
+      createdTimestamp: 1721656065895,
+      type: 0,
+      system: false,
+      content: '<@462339171537780737>, a <@&1264553025545044091> will arrive as soon as possible',
+      authorId: '1264507469464473722',
+      pinned: false,
+      tts: false,
+      nonce: null,
+      embeds: [Array],
+      components: [Array],
+      attachments: [],
+      stickers: [],
+      position: null,
+      roleSubscriptionData: null,
+      resolved: [Object],
+      editedTimestamp: null,
+      mentions: [Object],
+      webhookId: null,
+      groupActivityApplicationId: null,
+      applicationId: null,
+      activity: null,
+      flags: 0,
+      reference: null,
+      interaction: null,
+      poll: null,
+      cleanContent: '@EXELVI, a @Staff will arrive as soon as possible'
+    }
+      -->
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title
+                        <% if (message.authorId == ticket.authorId) { %>
+                            text-end 
+                        <% } %>
+                        ">
+                            <%=message.authorId%>
+                        </h5>
+                        <p class="card-text"><%=message.cleanContent%></p>
+                    </div>
+                </div>
+                
+                <% }) %> 
+            </div>
         </div>
         </div>
     </div>
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </html>
