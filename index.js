@@ -67,17 +67,43 @@ app.get('/tickets/:guild/:ticket', async (req, res) => {
         res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
 
     } else {
-        var transcript = await manager.broadcastEval(async (client, { channelID, serverID }) => {
-            const discordTranscripts = require('discord-html-transcripts');            
+   
+        res.render("ticket", { ticket: ticket, channel: channel })
+    }
+});
+
+app.get('/transcript/:guild/:ticket', async (req, res) => {
+    var guild = req.params.guild,
+        id = req.params.ticket
+
+        var channel = await manager.broadcastEval(async (client, { channelID, serverID }) => {
             var server = await client.guilds.cache.get(serverID)
             if (!server) return false
             var channel = await server.channels.cache.get(channelID)
             if (!channel) return false
-            await discordTranscripts.createTranscript(channel, { poweredBy: false, footerText: "{number} message{s} ", returnType: "string", saveImages: true });
+            return channel
         }, { context: { channelID: id, serverID: guild } });
-
-        res.render("ticket", { ticket: ticket, channel: channel, transcript: transcript })
-    }
+        var channel = channel.filter(x => x)[0]
+        if (!channel) {
+            if (!fs.existsSync(`transcripts/${guild}`)) return res.render("error", { error: "Not Found", code: "404", errormessage: "The transcript does not exist", textcolor: "secondary", color: "#433f33" });
+            if (!fs.existsSync(`transcripts/${guild}/${id}.html`))  return res.render("error", { error: "Not Found", code: "404", errormessage: "The transcript does not exist", textcolor: "secondary", color: "#433f33" });
+    
+            res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
+    
+        } else {
+            var transcript = await manager.broadcastEval(async (client, { channelID, serverID }) => {
+                const discordTranscripts = require('discord-html-transcripts');            
+                var server = await client.guilds.cache.get(serverID)
+                if (!server) return false
+                var channel = await server.channels.cache.get(channelID)
+                if (!channel) return false
+                return await discordTranscripts.createTranscript(channel, { poweredBy: false, footerText: "{number} message{s} ", returnType: "string", saveImages: true });
+            }, { context: { channelID: id, serverID: guild } });
+    
+            var transcript = transcript.filter(x => x)[0]
+            if (!transcript) return res.render("error", { error: "Not Found", code: "404", errormessage: "The transcript does not exist", textcolor: "secondary", color: "#433f33" });
+            res.send(transcript)
+        }
 });
 
 
