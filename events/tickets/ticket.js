@@ -34,56 +34,7 @@ module.exports = {
         var datacoso = await db.collection("tickets").find({ serverID: interaction.guild.id }).toArray()
 
         var config = await db.collection("config").findOne({ serverID: interaction.guild.id })
-        /*{
-  "_id": {
-    "$oid": "669cf8b5a53b28300792daf4"
-  },
-  "staffID": "1264553025545044091",
-  "log": {
-    "ticket": "1264554035910803507",
-    "transcript": "1264554001999855636"
-  },
-  "category": {
-    "open": "1264554158346866792",
-    "closed": "1264554192131985489"
-  },
-  "serverID": "587945307908603916",
-  ticketCategories: [
-    {
-      "label": "General Support",
-      "description": "A ticket for general support",
-      "value": "general",
-      "embedDescription": "Here you can ask for general support",
-      "emoji": "🔧",
-      "color": "#ababab"
-    },
-    {
-      "label": "Bug Report",
-      "description": "A ticket for bug report",
-      "value": "bug",
-      "embedDescription": "Here you can report a bug",
-      "emoji": "🐞",
-      "color": "#ff0000"
-    },
-    {
-      "label": "Suggestions",
-      "description": "A ticket for suggestions",
-      "value": "suggestions",
-      "embedDescription": "Here you can suggest something",
-      "emoji": "📝",
-      "color": "#ddffdd"
-    },
-    {
-      "label": "Other",
-      "description": "Other",
-      "value": "other",
-      "embedDescription": "Here you can ask for something that isn't listed",
-      "emoji": "❓",
-      "color": "#bb0000"
-    }
-    
-  ]
-}*/
+
         var ticketnum = countProps(datacoso).toString().padStart(4, '0');
         interaction.guild.channels.create({
             name: "ticket-" + ticketnum,
@@ -167,36 +118,7 @@ module.exports = {
             const row = new Discord.ActionRowBuilder()
                 .addComponents(menu);
 
-            canale.send({ content: "<@" + interaction.user.id + ">, a <@&" + config.staffID + "> will arrive as soon as possible", embeds: [embed], components: [row] }).then(async msg => {
-
-
-                const collector = msg.createMessageComponentCollector()
-
-                collector.on("collect", async i => {
-                    i.deferUpdate()
-
-                    if (i.values[0] == "tickett") {
-
-                        var embed = new Discord.EmbedBuilder()
-                            .setTitle("👁‍🗨 Testing 👁‍🗨")
-                            .setColor("#f8f800")
-                            .setDescription("This is a test ticket, this ticket is used to test the ticket system and its features")
-
-                        msg.edit({ embeds: [embed] })
-                    } else {
-                        var category = config.ticketCategories.find(x => x.value == i.values[0])
-
-                        var embed = new Discord.EmbedBuilder()
-                            .setTitle(category.emoji + " " + category.label + " " + category.emoji)
-                            .setColor(category.color)
-                            .setDescription(category.embedDescription)
-
-
-
-                        msg.edit({ embeds: [embed] })
-                    }
-                })
-            })
+            canale.send({ content: "<@" + interaction.user.id + ">, a <@&" + config.staffID + "> will arrive as soon as possible", embeds: [embed], components: [row] })
         })
     },
 };
