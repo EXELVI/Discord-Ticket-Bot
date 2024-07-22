@@ -17,10 +17,33 @@ function calculateAverage(myArray) {
     return summ / ArrayLen;
 }
 
+function getBestStaff(userstatsList) {
+    let bestStaffID = null;
+    let bestAvgStars = 0;
+    let mostFeedbacks = 0;
+  
+    userstatsList.forEach(userstats => {
+      const feedbacks = userstats.feedbacks;
+      const feedbacksCount = feedbacks.length;
+      if (feedbacksCount > mostFeedbacks) {
+        mostFeedbacks = feedbacksCount;
+        bestStaffID = userstats.userID;
+        bestAvgStars = feedbacks.reduce((sum, feedback) => sum + feedback.stars, 0) / feedbacksCount;
+      } else if (feedbacksCount === mostFeedbacks) {
+        const avgStars = feedbacks.reduce((sum, feedback) => sum + feedback.stars, 0) / feedbacksCount;
+        if (avgStars > bestAvgStars) {
+          bestStaffID = userstats.userID;
+          bestAvgStars = avgStars;
+        }
+      }
+    });
+  
+    return bestStaffID;
+  }
+  
+
 module.exports = {
     name: "leaderboard",
-    onlyStaff: true,
-    onlyInside: true,
     description: "Shows the best staff members",
     async execute(interaction) {
         const databasePromise = await require("../../db.js")
