@@ -15,7 +15,7 @@ module.exports = {
     var config = await db.collection("config").findOne({ serverID: i.guild.id })
     var nomec = i.message.channel.name
 
-    const attachment = await discordTranscripts.createTranscript(i.channel, { poweredBy: false, footerText: "{number} message{s} ", saveImages: true });
+    const attachment = await discordTranscripts.createTranscript(i.channel, { poweredBy: false, footerText: "{number} message{s} ", saveImages: false });
 
 
     var ticket = await db.collection("tickets").findOne({ ticketID: i.message.channel.id })

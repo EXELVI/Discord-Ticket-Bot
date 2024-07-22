@@ -67,18 +67,16 @@ app.get('/tickets/:guild/:ticket', async (req, res) => {
         res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
 
     } else {
-        var channelMessages = await manager.broadcastEval(async (client, { channelID, serverID }) => {
+        var transcript = await manager.broadcastEval(async (client, { channelID, serverID }) => {
+            const discordTranscripts = require('discord-html-transcripts');            
             var server = await client.guilds.cache.get(serverID)
             if (!server) return false
             var channel = await server.channels.cache.get(channelID)
             if (!channel) return false
-            var messages = await channel.messages.fetch({ limit: 100 })
-            var mapped = messages.map(x => {
-                return { author: x.author, content: x.content, cleanContent: x.cleanContent, timestamp: x.createdTimestamp } })
-            return mapped
+            await discordTranscripts.createTranscript(channel, { poweredBy: false, footerText: "{number} message{s} ", returnType: "string", saveImages: true });
         }, { context: { channelID: id, serverID: guild } });
-        console.log(channelMessages)
-        res.render("ticket", { ticket: ticket, channel: channel, messages: channelMessages.filter(x => x)[0] })
+
+        res.render("ticket", { ticket: ticket, channel: channel, transcript: transcript })
     }
 });
 
