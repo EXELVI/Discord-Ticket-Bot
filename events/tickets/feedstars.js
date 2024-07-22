@@ -1,7 +1,17 @@
 const Discord = require('discord.js');
 
-async function end(user, collected, stars, col, interaction) {
-    var settings = await db.collection("settings").findOne({ type: "settings" });
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+async function end(user, collected, stars, col, interaction, server) {
+    const database = await require("../../db.js")
+    const db = await database.db("tickets")
+    const config = await db.collection("config").findOne({ serverID: server })
+    var client = require("../../client.js")
+
     var staffUser = await client.users.fetch(user)
 
     var job = collected.first().content
@@ -17,7 +27,7 @@ async function end(user, collected, stars, col, interaction) {
         .setColor("#FFFF00")
         .setTimestamp();
 
-    client.channels.cache.get(settings.canali.feedback).send({ embeds: [embed] });
+    client.channels.cache.get(config.log.feedbacks).send({ embeds: [embed] });
 
     var feed = {
         feedbackID: getRandomIntInclusive(100000, 999999),
@@ -27,20 +37,20 @@ async function end(user, collected, stars, col, interaction) {
         date: new Date().getTime(),
         by: interaction.user.id
     }
-    var userdb = await db.collection("feedbacks").findOne({ userID: staffUser.id })
+    var userdb = await db.collection("feedbacks").findOne({ userID: staffUser.id, serverID: server })
     if (!userdb) {
-        db.collection("feedbacks").insertOne({ userID: staffUser.id, feedbacks: [feed] })
-        userdb = await db.collection("feedbacks").findOne({ userID: staffUser.id })
+        db.collection("feedbacks").insertOne({ userID: staffUser.id, feedbacks: [feed], serverID: server })
+        userdb = await db.collection("feedbacks").findOne({ userID: staffUser.id, serverID: server })
     } else {
-        db.collection("feedbacks").updateOne({ userID: staffUser.id }, { $push: { feedbacks: feed } })
+        db.collection("feedbacks").updateOne({ userID: staffUser.id, serverID: server }, { $push: { feedbacks: feed } })
     }
     interaction.channel.send(`Thank you for your time!`);
 }
 module.exports = {
     name: `interactionCreate`,
     async execute(interaction) {
-        const db = await require("../../db.js")
-        var settings = await db.collection("settings").findOne({ type: "settings" });
+ 
+
         if (!interaction.isButton()) return
         if (!interaction.customId.startsWith("feedbackstars-")) return
         let stars = interaction.customId.split("-")[1]
@@ -82,7 +92,7 @@ module.exports = {
 
                         interaction.channel.awaitMessages({ filter, max: 1, time: 120000, errors: ['time'] })
                             .then(async col => {
-                                end(interaction.message.embeds[0].fields[0].value, collected, stars, col, interaction)
+                                end(interaction.message.embeds[0].fields[0].value, collected, stars, col, interaction, interaction.message.embeds[0].fields[2].value)
                             })
                             .catch(col => {
                                 interaction.followUp('Time out!');

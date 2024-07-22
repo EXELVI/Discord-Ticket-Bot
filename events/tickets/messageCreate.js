@@ -3,8 +3,11 @@ const Discord = require('discord.js');
 module.exports = {
     name: "messageCreate",
     async execute(message) {
+
+        if (!message.guild) return
+
         const client = require('../../client.js');
-        const databasePromise = require('../../db.js');
+        const databasePromise = await require('../../db.js');
         const db = await databasePromise.db("tickets")
         const config = await db.collection("config").findOne({ serverID: message.guild.id })
 

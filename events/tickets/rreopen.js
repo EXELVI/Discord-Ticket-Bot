@@ -1,3 +1,5 @@
+const Discord = require("discord.js");
+
 function convert(integer) {
     var str = Number(integer).toString(16);
     return str.length == 1 ? "0" + str : str;
@@ -8,9 +10,9 @@ function to_rgb(r, g, b) { return "#" + convert(r) + convert(g) + convert(b); }
 module.exports = {
     name: "interactionCreate",
     
-    async execute(i) {
-        if (!i.isButton()) return;
-        if (i.customId != "rreopen") return;
+    async execute(interaction) {
+        if (!interaction.isButton()) return;
+        if (interaction.customId != "rreopen") return;
         const database = await require("../../db.js")
         const db = await database.db("tickets")
         const client = require("../../client.js")

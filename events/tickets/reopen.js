@@ -1,3 +1,5 @@
+const Discord = require("discord.js");
+
 function convert(integer) {
     var str = Number(integer).toString(16);
     return str.length == 1 ? "0" + str : str;

@@ -32,15 +32,14 @@ module.exports = {
       var user = await client.users.fetch(ticket.claim);
       ticket.claimName = user.tag
 
-      if (i.guild.id == "759013736509079593")
-        utente.send({
-          embeds: [new Discord.EmbedBuilder()
-            .setColor('#ffff00')
-            .setTitle('Feedback')
-            .setDescription("How many stars would you give to the staff that helped you? (1 to 5)")
-            .addFields({ name: "Staff ID", value: ticket.claim }, { name: "Staff Name", value: ticket.claimName }, { name: "Server", value: i.guild.id })
-          ], components: [new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-1")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-2")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-3")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-4")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-5"))]
-        }).catch({})
+      utente.send({
+        embeds: [new Discord.EmbedBuilder()
+          .setColor('#ffff00')
+          .setTitle('Feedback')
+          .setDescription("How many stars would you give to the staff that helped you? (1 to 5)")
+          .addFields({ name: "Staff ID", value: ticket.claim }, { name: "Staff Name", value: ticket.claimName }, { name: "Server", value: i.guild.id })
+        ], components: [new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-1")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-2")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-3")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-4")).addComponents(new Discord.ButtonBuilder().setLabel("⭐").setStyle("1").setCustomId("feedbackstars-5"))]
+      }).catch({})
     }
     let embed = new Discord.EmbedBuilder()
       .setTitle("Channel transcript")
