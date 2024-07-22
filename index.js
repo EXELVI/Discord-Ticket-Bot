@@ -44,15 +44,25 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 
+app.get('/:guild/:ticket', async (req, res) => {
+    var guild = req.params.guild,
+        id = req.params.ticket
+
+    const db = (await databasePromise).db("tickets")
+    var ticket = await db.collection("tickets").findOne({ ticketID: id, serverID: guild })
+    if (!ticket) return res.render("error", { error: "Not Found", code:"404", errormessage: "The ticket does not exist", textcolor: "secondary", color: "#333f73" });
+    res.render("ticket", { ticket: ticket })
+});
+
 app.get('/transcript/:guild/:ticket', async (req, res) => {
     var guild = req.params.guild,
         id = req.params.ticket
 
     const db = (await databasePromise).db("tickets")
     var ticket = await db.collection("tickets").findOne({ ticketID: id, serverID: guild })
-    if (!ticket) return res.send("Ticket inesistente")
-    if (!fs.existsSync(`transcripts/${guild}`)) return res.send("Transcript inesistente")
-    if (!fs.existsSync(`transcripts/${guild}/${id}.html`)) return res.send("Transcript inesistente")
+    if (!ticket) return res.send("The ticket does not exist")
+    if (!fs.existsSync(`transcripts/${guild}`)) return res.send("The transcript does not exist")
+    if (!fs.existsSync(`transcripts/${guild}/${id}.html`)) return res.send("The transcript does not exist")
     
     res.sendFile(path.join(__dirname + `/transcripts/${guild}/${id}.html`))
 });
