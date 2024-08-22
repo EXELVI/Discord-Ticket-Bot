@@ -87,7 +87,7 @@ module.exports = {
             interaction.channel.awaitMessages({ filter, max: 1, time: 120000, errors: ['time'] })
                 .then(collected => {
 
-                    interaction.channel.send(`Would you give advice to the user?`).then(() => {
+                    interaction.channel.send(`Would you give advice to the staffer?`).then(() => {
 
 
                         interaction.channel.awaitMessages({ filter, max: 1, time: 120000, errors: ['time'] })
