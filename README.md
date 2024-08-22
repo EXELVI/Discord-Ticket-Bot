@@ -25,7 +25,7 @@ To get started with the Discord Ticket Bot, follow the steps below:
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/Discord-Ticket-Bot.git
+    git clone https://github.com/EXELVI/Discord-Ticket-Bot.git
     cd Discord-Ticket-Bot
     ```
 
